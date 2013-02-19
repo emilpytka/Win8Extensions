@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Runtime.Serialization.Json;
 
-namespace Win8Extensions.Helpers
+namespace Win8Extensions.Utils
 {
     /// <summary>
     /// Generic class that serialize and deserialize object using json in one line. 
@@ -23,13 +23,11 @@ namespace Win8Extensions.Helpers
                 sw.Write(text);
                 sw.Flush();
                 objectStream.Position = 0;
+
+                var serializer = new DataContractJsonSerializer(typeof(T));
+                var sObject = serializer.ReadObject(objectStream) as T;
+                return sObject;
             }
-
-            var serializer = new DataContractJsonSerializer(typeof(T));
-            var sObject = serializer.ReadObject(objectStream) as T;
-            return sObject;
-
-
         }
 
         /// <summary>
