@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage;
 
-namespace Win8Extensions.Helpers
+namespace Win8Extensions.Utils
 {
     /// <summary>
     /// Class that can serialize and deserialize objects using json. 
@@ -27,17 +27,19 @@ namespace Win8Extensions.Helpers
         public async Task<T> GetObject(string filename) {
             var file = await _folder.GetFileAsync(filename);
 
+            T result = null;
+
             if (file != null) {
-                var reader = await file.OpenReadAsync();
-                var streamReader = new StreamReader(reader.AsStream());
-                var text = streamReader.ReadToEnd();
+                using (var reader = await file.OpenReadAsync()) {
+                    using (var streamReader = new StreamReader(reader.AsStream())) {
+                        var text = streamReader.ReadToEnd();
 
-                var serializer = new JsonSerializer<T>();
-                var result = serializer.Deserialize(text);
-
-                return result;
+                        var serializer = new JsonSerializer<T>();
+                        result = serializer.Deserialize(text);
+                    }
+                }
             }
-            return null;
+            return result;
         }
 
 
@@ -51,12 +53,12 @@ namespace Win8Extensions.Helpers
 
             var file = await _folder.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
             using (var stream = await file.OpenStreamForWriteAsync()) {
-
                 var serializer = new JsonSerializer<T>();
                 var json = serializer.Serialize(objectToSave);
 
-                var streamWriter = new StreamWriter(stream);
-                streamWriter.Write(json);
+                using (var streamWriter = new StreamWriter(stream)) {
+                    streamWriter.Write(json);
+                }
             }
         }
 

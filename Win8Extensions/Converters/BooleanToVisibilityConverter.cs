@@ -15,7 +15,7 @@ namespace Win8Extensions.Converters
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language) {
-            return value is Visibility && (Visibility)value == Visibility.Visible;
+            return (value is Visibility && (Visibility)value == Visibility.Visible);
         }
     }
 }
